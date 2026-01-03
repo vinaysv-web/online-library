@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumi Library - Payment</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="logo">Lumi Library</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="browse.html">Browse Books</a></li>
+                <li><a href="subscription.html">Subscription</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </header>
+
+        <main>
+            <section class="hero">
+        <div class="hero-content">
+            <h1>Complete Your Payment</h1>
+            <p>Securely process your subscription to unlock the galaxy of books</p>
+        </div>
+    </section>
+            
+            <div class="login-container">
+                <h2>Payment Information</h2>
+                <form id="cardPaymentForm">
+                    <div class="form-group">
+                        <select id="subscriptionPlan" class="form-control">
+                            <option value="">-- Select a Plan --</option>
+                            <option value="monthly">Monthly - $9.99/month</option>
+                            <option value="yearly" selected>Yearly - $79.99/year (Save 33%)</option>
+                            <option value="family">Family - $14.99/month (Up to 6 members)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="text" id="cardName" name="cardName" placeholder="Name on card" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="text" id="cardNumber" name="cardNumber" placeholder="Card number" maxlength="19" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="text" id="expiryDate" name="expiryDate" placeholder="Expiration date (MM/YY)" maxlength="5" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="password" id="cvv" name="cvv" placeholder="CVV" maxlength="4" required>
+                    </div>
+                    
+                    <button type="submit" class="btn">Start Membership</button>
+                </form>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Lumi Library. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

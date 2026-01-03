@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumi Library - Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="logo">Lumi Library</a>
+            <ul class="nav-links">
+                <li><a href="admin-dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="admin-users.html">Users</a></li>
+                <li><a href="admin-books.html">Books</a></li>
+                <li><a href="admin-subscriptions.html">Subscriptions</a></li>
+                <li><a href="admin-reports.html">Reports</a></li>
+                <li><a href="admin-settings.html">Settings</a></li>
+                <li><a href="index.html">Logout</a></li>
+            </ul>
+        </header>
+
+        <main>
+            <section class="hero">
+        <div class="hero-content">
+            <h1>Admin Dashboard</h1>
+            <p>Welcome, Administrator</p>
+        </div>
+    </section>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <h3><i class="fas fa-users"></i> Total Users</h3>
+                    <div class="number">1,248</div>
+                    <p>+12% from last month</p>
+                </div>
+                
+                <div class="stat-card">
+                    <h3><i class="fas fa-star"></i> Active Subscriptions</h3>
+                    <div class="number">856</div>
+                    <p>+8% from last month</p>
+                </div>
+                
+                <div class="stat-card">
+                    <h3><i class="fas fa-book"></i> Total Books</h3>
+                    <div class="number">3,421</div>
+                    <p>+5 new additions</p>
+                </div>
+                
+                <div class="stat-card">
+                    <h3><i class="fas fa-heart"></i> Books in Wishlists</h3>
+                    <div class="number">12,842</div>
+                    <p>+342 from last week</p>
+                </div>
+            </div>
+            
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-line"></i> New Users Over Time</h3>
+                    <div class="chart-placeholder">
+                        <canvas id="usersChart" width="400" height="200"></canvas>
+                        <p>Line chart showing user growth: Jan (85), Feb (92), Mar (105), Apr (120), May (135), Jun (156)</p>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-pie"></i> Subscription Distribution</h3>
+                    <div class="chart-placeholder">
+                        <canvas id="subscriptionsChart" width="400" height="200"></canvas>
+                        <p>Pie chart showing: Monthly (45%), Yearly (35%), Family (20%)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recent-activities">
+                <h2><i class="fas fa-history"></i> Recent Activities</h2>
+                <table class="activities-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Action</th>
+                            <th>Date/Time</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>cosmic_reader</td>
+                            <td>Book Added to Wishlist</td>
+                            <td>Today, 14:32</td>
+                            <td>"The Quantum Paradox"</td>
+                        </tr>
+                        <tr>
+                            <td>stellar_explorer</td>
+                            <td>New Subscription</td>
+                            <td>Today, 13:45</td>
+                            <td>Yearly Plan</td>
+                        </tr>
+                        <tr>
+                            <td>bookworm_galaxy</td>
+                            <td>Book Reviewed</td>
+                            <td>Today, 12:18</td>
+                            <td>"Cosmic Journeys" - 5 stars</td>
+                        </tr>
+                        <tr>
+                            <td>nebula_wanderer</td>
+                            <td>User Registered</td>
+                            <td>Today, 11:30</td>
+                            <td>New account</td>
+                        </tr>
+                        <tr>
+                            <td>alex_stellar</td>
+                            <td>Book Read</td>
+                            <td>Yesterday, 20:15</td>
+                            <td>"Stellar Winds" - 85% complete</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Lumi Library. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

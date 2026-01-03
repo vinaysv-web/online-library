@@ -1,0 +1,31 @@
+{
+  "name": "lumi-library",
+  "version": "1.0.0",
+  "description": "A digital book repository with a modern black and blue interface design",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "set PORT=3000 && node server/server.js",
+    "dev": "nodemon server/server.js"
+  },
+  "keywords": [
+    "library",
+    "books",
+    "digital",
+    "reading"
+  ],
+  "author": "Vinay Sv",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
