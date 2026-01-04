@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumi Library - Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="logo">Lumi Library</a>
+            <ul class="nav-links">
+                <li><a href="admin-dashboard.html" class="active">Dashboard</a></li>
+                <li><a href="admin-users.html">Users</a></li>
+                <li><a href="admin-books.html">Books</a></li>
+                <li><a href="admin-subscriptions.html">Subscriptions</a></li>
+                <li><a href="admin-reports.html">Reports</a></li>
+                <li><a href="admin-settings.html">Settings</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </header>
+
+        <main>
+            <section class="hero">
+                <div class="hero-content">
+                    <h1>Admin Dashboard</h1>
+                    <p>Welcome, Administrator</p>
+                </div>
+            </section>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <h3><i class="fas fa-users"></i> Total Users</h3>
+                    <div class="number" id="totalUsers">0</div>
+                    <p id="usersGrowth">Loading...</p>
+                </div>
+                
+                <div class="stat-card">
+                    <h3><i class="fas fa-star"></i> Active Subscriptions</h3>
+                    <div class="number" id="activeSubscriptions">0</div>
+                    <p id="subscriptionsGrowth">Loading...</p>
+                </div>
+                
+                <div class="stat-card">
+                    <h3><i class="fas fa-book"></i> Total Books</h3>
+                    <div class="number" id="totalBooks">0</div>
+                    <p id="booksGrowth">Loading...</p>
+                </div>
+                
+                <div class="stat-card">
+                    <h3><i class="fas fa-heart"></i> Books in Wishlists</h3>
+                    <div class="number" id="wishlistBooks">0</div>
+                    <p id="wishlistGrowth">Loading...</p>
+                </div>
+            </div>
+            
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-line"></i> New Users Over Time</h3>
+                    <div class="chart-placeholder">
+                        <canvas id="usersChart" width="400" height="200"></canvas>
+                        <p id="usersChartInfo">Loading user statistics...</p>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <h3><i class="fas fa-chart-pie"></i> Subscription Distribution</h3>
+                    <div class="chart-placeholder">
+                        <canvas id="subscriptionsChart" width="400" height="200"></canvas>
+                        <p id="subscriptionsChartInfo">Loading subscription statistics...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recent-activities">
+                <h2><i class="fas fa-history"></i> Recent Activities</h2>
+                <table class="activities-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Action</th>
+                            <th>Date/Time</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activitiesTableBody">
+                        <tr>
+                            <td colspan="4">Loading activities...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Lumi Library. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Admin dashboard functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated as admin
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user.role || user.role !== 'admin') {
+                alert('Access denied. Admin privileges required.');
+                window.location.href = 'admin-login.html';
+                return;
+            }
+            
+            // Load dashboard data
+            loadDashboardStats();
+            
+            // Logout functionality
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Clear authentication data
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('user');
+                    
+                    // Redirect to login
+                    window.location.href = 'admin-login.html';
+                });
+            }
+        });
+        
+        // Load dashboard statistics
+        async function loadDashboardStats() {
+            try {
+                const token = localStorage.getItem('authToken');
+                
+                // Get users count
+                const usersResponse = await fetch('/api/admin/users', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (usersResponse.ok) {
+                    const users = await usersResponse.json();
+                    document.getElementById('totalUsers').textContent = users.length;
+                    document.getElementById('usersGrowth').textContent = `Total: ${users.length}`;
+                }
+                
+                // Get books count
+                const booksResponse = await fetch('/api/admin/books', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (booksResponse.ok) {
+                    const books = await booksResponse.json();
+                    document.getElementById('totalBooks').textContent = books.length;
+                    document.getElementById('booksGrowth').textContent = `Total: ${books.length}`;
+                }
+                
+                // Get subscriptions count
+                const subscriptionsResponse = await fetch('/api/admin/subscriptions', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (subscriptionsResponse.ok) {
+                    const subscriptions = await subscriptionsResponse.json();
+                    const activeSubs = subscriptions.filter(sub => sub.isActive).length;
+                    document.getElementById('activeSubscriptions').textContent = activeSubs;
+                    document.getElementById('subscriptionsGrowth').textContent = `Active: ${activeSubs}`;
+                }
+                
+                // Update activities table (using sample data for now)
+                updateActivitiesTable();
+                
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+                alert('Error loading dashboard data. Please refresh the page.');
+            }
+        }
+        
+        // Update activities table
+        function updateActivitiesTable() {
+            const activitiesTableBody = document.getElementById('activitiesTableBody');
+            
+            if (activitiesTableBody) {
+                activitiesTableBody.innerHTML = `
+                    <tr>
+                        <td>john_doe</td>
+                        <td>User Registered</td>
+                        <td>${new Date().toLocaleString()}</td>
+                        <td>New account created</td>
+                    </tr>
+                    <tr>
+                        <td>jane_smith</td>
+                        <td>New Subscription</td>
+                        <td>${new Date().toLocaleString()}</td>
+                        <td>Basic Plan</td>
+                    </tr>
+                    <tr>
+                        <td>bob_johnson</td>
+                        <td>Book Added</td>
+                        <td>${new Date().toLocaleString()}</td>
+                        <td>New book added to library</td>
+                    </tr>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

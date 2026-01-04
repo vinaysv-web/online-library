@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumi Library - Admin Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="logo">Lumi Library</a>
+        </header>
+
+        <main>
+            <div class="login-container">
+                <h2>Admin Login</h2>
+                <form id="adminLoginForm">
+                    <div class="form-group">
+                        <input type="email" id="email" name="email" placeholder="Admin Email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="password" id="password" name="password" placeholder="Password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn">Login as Admin</button>
+                </form>
+                
+                <div class="form-footer">
+                    <p><a href="index.html">Back to Main Site</a></p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Lumi Library. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Admin login functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const adminLoginForm = document.getElementById('adminLoginForm');
+            
+            if (adminLoginForm) {
+                adminLoginForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    
+                    // Validate inputs
+                    if (!email || !password) {
+                        alert('Please fill in all fields');
+                        return;
+                    }
+                    
+                    // Email validation
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        alert('Please enter a valid email address');
+                        return;
+                    }
+                    
+                    try {
+                        const response = await fetch('/api/auth/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email, password }),
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            // Store auth token and user info in localStorage
+                            localStorage.setItem('authToken', data.token);
+                            localStorage.setItem('user', JSON.stringify(data.user));
+                            
+                            // Check if user is admin
+                            if (email === 'admin@lumilibrary.com') {
+                                // Set admin role in user data
+                                const userData = data.user;
+                                userData.role = 'admin';
+                                localStorage.setItem('user', JSON.stringify(userData));
+                                
+                                alert('Welcome back, Administrator!');
+                                window.location.href = 'admin-dashboard.html';
+                            } else {
+                                alert('Access denied. Admin privileges required.');
+                            }
+                        } else {
+                            alert(data.message || 'Admin login failed');
+                        }
+                    } catch (error) {
+                        console.error('Admin login error:', error);
+                        alert('Admin login failed. Please try again.');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

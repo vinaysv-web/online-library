@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumi Library - Admin Reports</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="logo">Lumi Library</a>
+            <ul class="nav-links">
+                <li><a href="admin-dashboard.html">Dashboard</a></li>
+                <li><a href="admin-users.html">Users</a></li>
+                <li><a href="admin-books.html">Books</a></li>
+                <li><a href="admin-subscriptions.html">Subscriptions</a></li>
+                <li><a href="admin-reports.html" class="active">Reports</a></li>
+                <li><a href="admin-settings.html">Settings</a></li>
+                <li><a href="#" id="logoutBtn">Logout</a></li>
+            </ul>
+        </header>
+
+        <main>
+            <section class="hero">
+                <div class="hero-content">
+                    <h1>Reports & Analytics</h1>
+                    <p>View system reports and analytics</p>
+                </div>
+            </section>
+            
+            <div class="admin-content">
+                <div class="reports-overview">
+                    <div class="stat-card">
+                        <h3><i class="fas fa-users"></i> Total Users</h3>
+                        <div class="number" id="totalUsers">0</div>
+                        <p id="usersGrowth">Loading...</p>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3><i class="fas fa-book"></i> Total Books</h3>
+                        <div class="number" id="totalBooks">0</div>
+                        <p id="booksGrowth">Loading...</p>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3><i class="fas fa-dollar-sign"></i> Revenue</h3>
+                        <div class="number" id="totalRevenue">$0.00</div>
+                        <p id="revenueGrowth">Loading...</p>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <h3><i class="fas fa-chart-line"></i> Active Users</h3>
+                        <div class="number" id="activeUsers">0</div>
+                        <p id="activeGrowth">Loading...</p>
+                    </div>
+                </div>
+                
+                <div class="reports-section">
+                    <h2><i class="fas fa-file-alt"></i> Generate Reports</h2>
+                    <div class="report-actions">
+                        <button class="btn" id="generateUserReport"><i class="fas fa-users"></i> User Report</button>
+                        <button class="btn" id="generateBookReport"><i class="fas fa-book"></i> Book Report</button>
+                        <button class="btn" id="generateSubscriptionReport"><i class="fas fa-receipt"></i> Subscription Report</button>
+                        <button class="btn" id="generateRevenueReport"><i class="fas fa-dollar-sign"></i> Revenue Report</button>
+                    </div>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-line"></i> User Growth</h3>
+                        <div class="chart-placeholder">
+                            <canvas id="userGrowthChart" width="400" height="200"></canvas>
+                            <p id="userGrowthInfo">Loading user growth data...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3><i class="fas fa-chart-pie"></i> Book Categories</h3>
+                        <div class="chart-placeholder">
+                            <canvas id="bookCategoriesChart" width="400" height="200"></canvas>
+                            <p id="bookCategoriesInfo">Loading book category data...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recent-activities">
+                    <h2><i class="fas fa-history"></i> Recent System Activity</h2>
+                    <table class="activities-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Activity</th>
+                                <th>User</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activityTableBody">
+                            <tr>
+                                <td colspan="4">Loading activities...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Lumi Library. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // Admin reports page functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated as admin
+            const token = localStorage.getItem('authToken');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token || !user.role || user.role !== 'admin') {
+                alert('Access denied. Admin privileges required.');
+                window.location.href = 'admin-login.html';
+                return;
+            }
+            
+            // Load reports data
+            loadReportsData();
+            
+            // Logout functionality
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Clear authentication data
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('user');
+                    
+                    // Redirect to login
+                    window.location.href = 'admin-login.html';
+                });
+            }
+            
+            // Report generation buttons
+            document.getElementById('generateUserReport').addEventListener('click', function() {
+                generateReport('user');
+            });
+            
+            document.getElementById('generateBookReport').addEventListener('click', function() {
+                generateReport('book');
+            });
+            
+            document.getElementById('generateSubscriptionReport').addEventListener('click', function() {
+                generateReport('subscription');
+            });
+            
+            document.getElementById('generateRevenueReport').addEventListener('click', function() {
+                generateReport('revenue');
+            });
+        });
+        
+        // Load reports data
+        async function loadReportsData() {
+            try {
+                const token = localStorage.getItem('authToken');
+                
+                // Get users count
+                const usersResponse = await fetch('/api/admin/users', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (usersResponse.ok) {
+                    const users = await usersResponse.json();
+                    document.getElementById('totalUsers').textContent = users.length;
+                    document.getElementById('usersGrowth').textContent = `Total: ${users.length}`;
+                }
+                
+                // Get books count
+                const booksResponse = await fetch('/api/admin/books', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (booksResponse.ok) {
+                    const books = await booksResponse.json();
+                    document.getElementById('totalBooks').textContent = books.length;
+                    document.getElementById('booksGrowth').textContent = `Total: ${books.length}`;
+                }
+                
+                // Get subscriptions for revenue calculation
+                const subscriptionsResponse = await fetch('/api/admin/subscriptions', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (subscriptionsResponse.ok) {
+                    const subscriptions = await subscriptionsResponse.json();
+                    const totalRevenue = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
+                    document.getElementById('totalRevenue').textContent = `$${totalRevenue.toFixed(2)}`;
+                    document.getElementById('revenueGrowth').textContent = `Total: $${totalRevenue.toFixed(2)}`;
+                    
+                    // Active users count
+                    const activeSubs = subscriptions.filter(sub => sub.isActive).length;
+                    document.getElementById('activeUsers').textContent = activeSubs;
+                    document.getElementById('activeGrowth').textContent = `Active: ${activeSubs}`;
+                }
+                
+                // Update activities table
+                updateActivityTable();
+                
+            } catch (error) {
+                console.error('Error loading reports data:', error);
+            }
+        }
+        
+        // Update activity table
+        function updateActivityTable() {
+            const activityTableBody = document.getElementById('activityTableBody');
+            
+            if (activityTableBody) {
+                activityTableBody.innerHTML = `
+                    <tr>
+                        <td>${new Date().toLocaleString()}</td>
+                        <td>System Backup</td>
+                        <td>System</td>
+                        <td>Database backup completed successfully</td>
+                    </tr>
+                    <tr>
+                        <td>${new Date(Date.now() - 3600000).toLocaleString()}</td>
+                        <td>User Registered</td>
+                        <td>John Doe</td>
+                        <td>New user registration</td>
+                    </tr>
+                    <tr>
+                        <td>${new Date(Date.now() - 7200000).toLocaleString()}</td>
+                        <td>Book Added</td>
+                        <td>Jane Smith</td>
+                        <td>New book added to library</td>
+                    </tr>
+                    <tr>
+                        <td>${new Date(Date.now() - 10800000).toLocaleString()}</td>
+                        <td>Subscription Created</td>
+                        <td>Bob Johnson</td>
+                        <td>Basic plan subscription</td>
+                    </tr>
+                `;
+            }
+        }
+        
+        // Generate report
+        function generateReport(reportType) {
+            let reportTitle = '';
+            let reportData = {};
+            
+            switch(reportType) {
+                case 'user':
+                    reportTitle = 'User Report';
+                    reportData = { type: 'user', date: new Date().toISOString() };
+                    break;
+                case 'book':
+                    reportTitle = 'Book Report';
+                    reportData = { type: 'book', date: new Date().toISOString() };
+                    break;
+                case 'subscription':
+                    reportTitle = 'Subscription Report';
+                    reportData = { type: 'subscription', date: new Date().toISOString() };
+                    break;
+                case 'revenue':
+                    reportTitle = 'Revenue Report';
+                    reportData = { type: 'revenue', date: new Date().toISOString() };
+                    break;
+                default:
+                    alert('Invalid report type');
+                    return;
+            }
+            
+            // In a real app, this would generate a detailed report
+            alert(`${reportTitle} generated successfully!`);
+            console.log('Generated report:', reportData);
+        }
+    </script>
+</body>
+</html>

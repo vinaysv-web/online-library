@@ -1,6 +1,21 @@
 // Lumi Library - Main JavaScript file
 const API_BASE_URL = '/api';
 
+// Check if user is admin
+function isAdmin() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    return user.role === 'admin';
+}
+
+// Redirect to appropriate dashboard after login
+function redirectToDashboard(isAdminUser = false) {
+    if (isAdminUser) {
+        window.location.href = 'admin-dashboard.html';
+    } else {
+        window.location.href = 'index.html';
+    }
+}
+
 // DOM ready function
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize the application
@@ -440,17 +455,22 @@ async function simulateLogin(email, password) {
         if (response.ok) {
             alert('Welcome back! Login successful');
             
-            // Store auth token in localStorage
+            // Store auth token and user info in localStorage
             localStorage.setItem('authToken', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
             
-            // Redirect to dashboard or home page
-            window.location.href = 'index.html';
+            // Check if user is admin for role-based redirection
+            const isAdminUser = data.user.email === 'admin@lumilibrary.com'; // Default admin email
+            redirectToDashboard(isAdminUser);
         } else {
-            alert(data.message || 'Login failed');
+            // Handle specific error messages
+            const errorMessage = data.message || 'Login failed';
+            alert(errorMessage);
+            console.error('Login error:', errorMessage);
         }
     } catch (error) {
         console.error('Login error:', error);
-        alert('Login failed. Please try again.');
+        alert('Login failed. Please check your connection and try again.');
     }
 }
 
@@ -469,17 +489,21 @@ async function simulateSignup(name, email, password) {
         if (response.ok) {
             alert('Account created successfully');
             
-            // Store auth token in localStorage
+            // Store auth token and user info in localStorage
             localStorage.setItem('authToken', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
             
-            // Redirect to dashboard or home page
-            window.location.href = 'index.html';
+            // Redirect to appropriate dashboard
+            redirectToDashboard(false);
         } else {
-            alert(data.message || 'Registration failed');
+            // Handle specific error messages
+            const errorMessage = data.message || 'Registration failed';
+            alert(errorMessage);
+            console.error('Registration error:', errorMessage);
         }
     } catch (error) {
         console.error('Registration error:', error);
-        alert('Registration failed. Please try again.');
+        alert('Registration failed. Please check your connection and try again.');
     }
 }
 
@@ -501,11 +525,14 @@ async function simulateContactSubmit(name, email, subject, message) {
             // Reset form
             document.getElementById('messageForm').reset();
         } else {
-            alert(data.message || 'Failed to send message. Please try again.');
+            // Handle specific error messages
+            const errorMessage = data.message || 'Failed to send message. Please try again.';
+            alert(errorMessage);
+            console.error('Contact form error:', errorMessage);
         }
     } catch (error) {
         console.error('Contact form error:', error);
-        alert('Failed to send message. Please try again.');
+        alert('Failed to send message. Please check your connection and try again.');
     }
 }
 
@@ -548,11 +575,14 @@ async function simulatePayment(plan, cardName, cardNumber, expiryDate, cvv) {
             alert('Payment successful! Welcome to Lumi Library.');
             window.location.href = 'index.html';
         } else {
-            alert(data.message || 'Payment failed');
+            // Handle specific error messages
+            const errorMessage = data.message || 'Payment failed';
+            alert(errorMessage);
+            console.error('Payment error:', errorMessage);
         }
     } catch (error) {
         console.error('Payment error:', error);
-        alert('Payment failed. Please try again.');
+        alert('Payment failed. Please check your connection and try again.');
     }
 }
 
